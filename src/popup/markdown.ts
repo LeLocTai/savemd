@@ -2,41 +2,16 @@ import TurndownService from '@joplin/turndown'
 import { gfm } from '@joplin/turndown-plugin-gfm'
 import { browser } from 'webextension-polyfill-ts'
 
-
-const previewEl = document.getElementById('preview')!
-
-// browser.runtime.sendMessage({ cmd: 'want-dom' })
-
-wantHtml()
-
-document.getElementById('download')!.onclick = async () =>
-{
-    wantHtml()
-}
-
-browser.runtime.onMessage.addListener((msg) =>
-{
-    switch (msg.cmd)
-    {
-        case 'give-html': gotHtml(msg.payload)
-    }
-})
-
-async function wantHtml()
+export async function getPageMd()
 {
     const activeTabs = await browser.tabs.query({ active: true, currentWindow: true, })
     const id = activeTabs[0].id
 
-    if (id)
-        browser.tabs.sendMessage(id, { cmd: 'want-html' })
-}
+    if (!id) return '';
 
-let html
-function gotHtml(newHtml)
-{
-    html = newHtml
+    const html = await browser.tabs.sendMessage(id, { cmd: 'want-html' })
 
-    previewEl.innerHTML = html2md(html)
+    return html2md(html)
 }
 
 function html2md(html)

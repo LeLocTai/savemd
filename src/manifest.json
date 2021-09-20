@@ -24,7 +24,7 @@
   ],
   "browser_action": {
     "default_title": "SaveMD",
-    "default_popup": "popup.html",
+    "default_popup": "popup/popup.html",
     "default_icon": {
       "128": "icon.png"
     }

@@ -1,14 +1,11 @@
 import { browser } from "webextension-polyfill-ts";
 
-browser.runtime.onMessage.addListener((msg) =>
+browser.runtime.onMessage.addListener(async (msg) =>
 {
     switch (msg.cmd)
     {
-        case 'want-html': giveHtml()
+        case 'want-html': return document.documentElement.outerHTML
     }
-})
 
-function giveHtml()
-{
-    browser.runtime.sendMessage({ cmd: 'give-html', payload: document.documentElement.outerHTML })
-}
+    throw 'Unhandle message: ' + msg.cmd
+})
