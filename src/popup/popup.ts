@@ -1,14 +1,28 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { download } from './download';
 import { getPageMd } from './markdown';
 
 @customElement('popup-main')
 class PopupMain extends LitElement
 {
     static styles = css`
+        * {
+            box-sizing: border-box;
+        }
+
         :host {
-            display: block;
+            display:block;
             width: 20em;
+        }
+
+        #main {
+            padding: 8px;
+        }
+
+        input, textarea{
+            display: block;
+            width: 100%;
         }
 
         #title {
@@ -24,32 +38,60 @@ class PopupMain extends LitElement
         }
     `;
     @state()
-    protected _md = ''
+    protected page?: any
+
+    @state()
+    protected _savePath = "Documents/Notes"
+
+    @state()
+    protected working = false
 
     constructor()
     {
         super()
 
-        this._updateMd()
+        this._updatePage()
     }
 
 
-    async _updateMd()
+    async _updatePage()
     {
-        this._md = await getPageMd()
+        this.working = true;
+        this.page = await getPageMd()
+        this.working = false;
+    }
+
+    _savePathChanged(e)
+    {
+        this._savePath = e.target.value;
+    }
+
+    _download()
+    {
+        if (!this.page)
+            return
+
+        download(this.page, this._savePath, this._savePath)
     }
 
     render()
     {
+        const content = this.page
+            ? html`
+            <h2 id="title">${this.page.title}</h2>
+            <p><label for="tags">Tags: </label><input id="tags" type="text"></p>
+            <p><label for="path">Path: </label><input id="path" type="text" value="${this._savePath}"
+                    @input="${this._savePathChanged}"></p>
+            <p><textarea id="preview" rows=15>${this.page.md}</textarea></p>
+            <p>${Object.keys(this.page.imgs).length || 0} images</p>
+            <button id="download" @click="${this._download}" enabled=${!this.working}>Download</button>
+`
+            : html`...`
+
         return html`
-        <h2 id="title">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget purus eget magna efficitur
-            maximus.Suspendisse iaculis dolor at tellus convallis, vel tincidunt neque consequat. Pellentesque tempus sapien
-            vitae nibh vestibulum, quis posuere neque ultricies. Nullam condimentum ligula nec egestas imperdiet. Phasellus
-            iaculis nulla ut eros posuere lacinia sit amet eget enim.</h2>
-        <p><label for="tags">Tags: </label><input id="tags" type="text"></p>
-        <p><label for="path">Path: </label><input id="path" type="text" value="Web Clips"></p>
-        <p><textarea id="preview">${this._md}</textarea></p>
-        <button id="download" @click="${this._updateMd}">Download</button>
+        <div id="main">
+            ${content}
+        </div>
         `;
     }
 }

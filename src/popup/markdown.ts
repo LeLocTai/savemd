@@ -9,12 +9,21 @@ export async function getPageMd()
 
     if (!id) return '';
 
-    const html = await browser.tabs.sendMessage(id, { cmd: 'want-html' })
+    const document = await browser.tabs.sendMessage(id, { cmd: 'want-html' })
 
-    return html2md(html)
+    let page: Page = {
+        url: document.url,
+        title: document.title,
+        imgs: {},
+        md: ''
+    }
+
+    fillFromHtml(page, document.body)
+
+    return page
 }
 
-function html2md(html)
+function fillFromHtml(page: Page, html: string)
 {
     var turndown = new TurndownService({
         headingStyle: 'atx',
@@ -42,9 +51,40 @@ function html2md(html)
         }
     })
 
+    turndown.addRule('img', {
+        filter: function (node)
+        {
+            return node.nodeName === 'IMG' && node.getAttribute('src');
+        },
+
+        replacement: function (content, node, options)
+        {
+            const alt = node.getAttribute('alt') || ''
+            const src = node.getAttribute('src')
+
+
+            const srcUrl = new URL(src, page.url)
+            const name = srcUrl.pathname.substring(srcUrl.pathname.lastIndexOf('/') + 1)
+            let savedName = name
+
+            let dupCount = 1;
+            while (page.imgs.hasOwnProperty(savedName))
+            {
+                savedName = name + ` (${dupCount++})`
+            }
+
+            page.imgs[savedName] = srcUrl.href
+
+            const savedPath = encodeURI(`${page.title}/${savedName}`)
+
+            return `![${alt}](${savedPath})`;
+        }
+    })
+
     let md: string = turndown.turndown(html)
 
     md = md.replaceAll(/(\$\$[\S\s]+?(\$\$)[^\r\n])/gm, '$1\n')
+    md = md.replaceAll('\xa0', ' ')
 
-    return md
+    page.md = md
 }
