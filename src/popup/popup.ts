@@ -13,11 +13,12 @@ class PopupMain extends LitElement
 
         :host {
             display:block;
-            width: 20em;
+            width: 30em;
+            font-family: sans-serif;
         }
 
         #main {
-            padding: 8px;
+            padding: 16px;
         }
 
         input, textarea{
@@ -25,16 +26,23 @@ class PopupMain extends LitElement
             width: 100%;
         }
 
+        textarea{
+            resize: vertical;
+        }
+
         #title {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 3;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-family: sans-serif;
+            font-size: 1.2em;
+            font-weight: bold;
         }
 
         #preview {
             white-space: pre-wrap;
+        }
+
+        #download{
+            padding: .5em;
+            width: 100%;
         }
     `;
     @state()
@@ -78,11 +86,11 @@ class PopupMain extends LitElement
     {
         const content = this.page
             ? html`
-            <h2 id="title">${this.page.title}</h2>
+            <textarea id='title' rows=1>${this.page.title}</textarea>
+            <p><textarea id="preview" rows=15>${this.page.md}</textarea></p>
             <p><label for="tags">Tags: </label><input id="tags" type="text"></p>
             <p><label for="path">Path: </label><input id="path" type="text" value="${this._savePath}"
                     @input="${this._savePathChanged}"></p>
-            <p><textarea id="preview" rows=15>${this.page.md}</textarea></p>
             <p>${Object.keys(this.page.imgs).length || 0} images</p>
             <button id="download" @click="${this._download}" enabled=${!this.working}>Download</button>
 `
