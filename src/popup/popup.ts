@@ -1,5 +1,17 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import optionsStorage, { Options } from '../option/options-storage';
+
+import '@spectrum-web-components/theme/sp-theme.js';
+import '@spectrum-web-components/theme/theme-light.js';
+import '@spectrum-web-components/theme/scale-medium.js';
+import '@spectrum-web-components/field-label/sp-field-label.js';
+import '@spectrum-web-components/textfield/sp-textfield.js';
+import '@spectrum-web-components/button/sp-button.js';
+import '@spectrum-web-components/progress-circle/sp-progress-circle.js';
+
+import '../components/textarea';
+
 import { download } from './download';
 import { getPageMd } from './markdown';
 
@@ -19,25 +31,14 @@ class PopupMain extends LitElement
 
         #main {
             padding: 16px;
+            background: var(--spectrum-global-color-gray-100);
         }
-
-        input, textarea{
-            display: block;
+        custom-textfield {
             width: 100%;
         }
 
-        textarea{
-            resize: vertical;
-        }
-
-        #title {
-            font-family: sans-serif;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
         #preview {
-            white-space: pre-wrap;
+            margin-top: .5em;
         }
 
         #download{
@@ -45,33 +46,50 @@ class PopupMain extends LitElement
             width: 100%;
         }
     `;
+
+    titleStyle = css`
+        .input {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    `;
+
+    previewStyle = css`
+        :host([multiline]) textarea.input {
+            width: 100% !important;
+            height: 15em;
+            min-height: 6em;
+            max-height: 25em;
+        }
+    `;
+
     @state()
     protected page?: any
 
     @state()
-    protected _savePath = "Documents/Notes"
+    protected working = false
 
     @state()
-    protected working = false
+    protected _options?: Options
 
     constructor()
     {
         super()
 
-        this._updatePage()
+        this._loadOptions()
     }
 
+    async _loadOptions()
+    {
+        this._options = await optionsStorage.getAll()
+        this._updatePage()
+    }
 
     async _updatePage()
     {
         this.working = true;
-        this.page = await getPageMd()
+        this.page = await getPageMd(this._options!)
         this.working = false;
-    }
-
-    _savePathChanged(e)
-    {
-        this._savePath = e.target.value;
     }
 
     _download()
@@ -79,27 +97,33 @@ class PopupMain extends LitElement
         if (!this.page)
             return
 
-        download(this.page, this._savePath, this._savePath)
+        download(this.page, this._options!)
     }
 
     render()
     {
         const content = this.page
             ? html`
-            <textarea id='title' rows=1>${this.page.title}</textarea>
-            <p><textarea id="preview" rows=15>${this.page.md}</textarea></p>
-            <p><label for="tags">Tags: </label><input id="tags" type="text"></p>
-            <p><label for="path">Path: </label><input id="path" type="text" value="${this._savePath}"
-                    @input="${this._savePathChanged}"></p>
+            <custom-textfield id="title" customstyles=${this.titleStyle.cssText} multiline quiet value="${this.page.title}"></custom-textfield>
+            <custom-textfield id="preview" customstyles=${this.previewStyle.cssText} multiline value="${this.page.md}"></custom-textfield>
+            <sp-field-label for="tags">Tags: </sp-field-label>
+            <custom-textfield id="tags" ></custom-textfield>
             <p>${Object.keys(this.page.imgs).length || 0} images</p>
-            <button id="download" @click="${this._download}" enabled=${!this.working}>Download</button>
+            <sp-button id="download" @click="${this._download}" enabled=${!this.working}>Download</sp-button>
 `
-            : html`...`
+            : html`
+            <sp-progress-circle
+                label="A medium representation of an unclear amount of work"
+                indeterminate
+            ></sp-progress-circle>
+`
 
         return html`
-        <div id="main">
-            ${content}
-        </div>
+        <sp-theme color="light" scale="medium">
+            <div id="main">
+                    ${content}
+            </div>
+        </sp-theme>
         `;
     }
 }

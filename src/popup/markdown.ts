@@ -1,8 +1,12 @@
 import TurndownService from '@joplin/turndown'
 import { gfm } from '@joplin/turndown-plugin-gfm'
+import sanitize from 'sanitize-filename'
 import { browser } from 'webextension-polyfill-ts'
+import { Options } from '../option/options-storage'
+import path from 'path-browserify'
+import { ensureTrailingSlash } from '../utils'
 
-export async function getPageMd()
+export async function getPageMd(options: Options)
 {
     const activeTabs = await browser.tabs.query({ active: true, currentWindow: true, })
     const id = activeTabs[0].id
@@ -13,17 +17,20 @@ export async function getPageMd()
 
     let page: Page = {
         url: document.url,
-        title: document.title,
+        title: sanitize(document.title),
         imgs: {},
         md: ''
     }
 
-    fillFromHtml(page, document.body)
+    let imagePath = options.imgPath.replaceAll('{title}', page.title)
+    imagePath = ensureTrailingSlash(path.relative(options.mdPath, imagePath))
+
+    fillFromHtml(page, imagePath, document.body)
 
     return page
 }
 
-function fillFromHtml(page: Page, html: string)
+function fillFromHtml(page: Page, imagePath: string, html: string)
 {
     var turndown = new TurndownService({
         headingStyle: 'atx',
@@ -75,9 +82,9 @@ function fillFromHtml(page: Page, html: string)
 
             page.imgs[savedName] = srcUrl.href
 
-            const savedPath = encodeURI(`${page.title}/${savedName}`)
+            const savedURI = encodeURI(`${imagePath}${savedName}`)
 
-            return `![${alt}](${savedPath})`;
+            return `![${alt}](${savedURI})`;
         }
     })
 
