@@ -15,14 +15,22 @@ export async function getPageMd(options: Options)
 
     const document = await browser.tabs.sendMessage(id, { cmd: 'want-html' })
 
+    let title = document.title
+        .trim()
+        .replace(/\.$/, '')
+    title = sanitize(title, { replacement: '_' })
+
+    let shortTitle = title.length <= 60 ? title : title.substring(0, 60) + '_'
+
     let page: Page = {
         url: document.url,
-        title: sanitize(document.title),
+        title,
+        shortTitle,
         imgs: {},
         md: ''
     }
 
-    let imagePath = options.imgPath.replaceAll('{title}', page.title)
+    let imagePath = options.imgPath.replaceAll('{title}', page.shortTitle)
     imagePath = ensureTrailingSlash(path.relative(options.mdPath, imagePath))
 
     fillFromHtml(page, imagePath, document.body)

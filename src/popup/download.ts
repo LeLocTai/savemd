@@ -5,7 +5,7 @@ export async function download(page: Page, options: Options)
 {
     const mdObjUrl = URL.createObjectURL(new Blob([page.md], { type: 'text/markdown;charset=utf-8' }))
     const mdFilePath = options.mdPath + page.title + '.md'
-    const imagePath = options.imgPath.replaceAll('{title}', page.title)
+    const imagePath = options.imgPath.replaceAll('{title}', page.shortTitle)
 
     browser.downloads.onChanged.addListener(async (dl) =>
     {

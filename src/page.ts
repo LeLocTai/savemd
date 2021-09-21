@@ -4,6 +4,7 @@ interface Page
 {
     url: string;
     title: string;
+    shortTitle: string;
     md: string;
     imgs: Images;
 }
