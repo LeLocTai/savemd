@@ -12,7 +12,19 @@ export async function getCurrentPage(options: Options)
 
     if (!id) return undefined;
 
-    const document = await browser.tabs.sendMessage(id, { cmd: 'want-html' })
+    let document;
+
+    while (true)
+    {
+        try
+        {
+            document = await browser.tabs.sendMessage(id, { cmd: 'want-html' })
+            break
+        } catch {
+            await new Promise(r => setTimeout(r, 500))
+            continue
+        }
+    }
 
     let page = new Page(document, options)
 

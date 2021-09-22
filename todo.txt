@@ -1,12 +1,1 @@
-option page
-    image path
-    md path
-
-front matter
-    source
-    created
-    tags
-
-editable title
-
-maybe some style
+simplified

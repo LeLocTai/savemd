@@ -45,7 +45,8 @@
       ],
       "js": [
         "content.ts"
-      ]
+      ],
+      "run_at": "document_idle"
     }
   ]
 }

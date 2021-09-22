@@ -119,6 +119,8 @@ class PopupMain extends LitElement
 
     render()
     {
+        console.log(this.page?.imgs);
+
         const content = this.page
             ? html`
             <custom-textfield
