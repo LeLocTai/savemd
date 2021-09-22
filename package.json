@@ -24,6 +24,7 @@
     "@spectrum-web-components/bundle": "^0.22.8",
     "@webcomponents/webcomponentsjs": "^2.6.0",
     "lit": "^2.0.0-rc.4",
+    "lodash": "^4.17.21",
     "path-browserify": "^1.0.1",
     "sanitize-filename": "^1.6.3",
     "webext-options-sync": "^2.0.1",

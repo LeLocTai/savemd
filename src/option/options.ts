@@ -9,7 +9,6 @@ import '@spectrum-web-components/textfield/sp-textfield.js';
 import '../components/textarea';
 
 import optionsStorage, { Options } from "./options-storage";
-import { ensureTrailingSlash } from "../utils";
 
 @customElement('option-main')
 class OptionMain extends LitElement
@@ -68,7 +67,6 @@ class OptionMain extends LitElement
         if (id.endsWith('Path'))
         {
             newValue = newValue.trim()
-            newValue = ensureTrailingSlash(newValue)
         }
 
         e.target.value = newValue

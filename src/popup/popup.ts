@@ -13,7 +13,9 @@ import '@spectrum-web-components/progress-circle/sp-progress-circle.js';
 import '../components/textarea';
 
 import { download } from './download';
-import { getPageMd } from './markdown';
+import { getCurrentPage } from './markdown';
+import { Page } from './page';
+import isEqual from 'lodash/isEqual';
 
 @customElement('popup-main')
 class PopupMain extends LitElement
@@ -58,14 +60,14 @@ class PopupMain extends LitElement
     static previewStyle = css`
         :host([multiline]) textarea.input {
             width: 100% !important;
-            height: 15em;
-            min-height: 6em;
-            max-height: 25em;
+            height: 400px;
         }
     `;
 
-    @state()
-    protected page?: any
+    @state({
+        hasChanged: (next, prev) => isEqual(next, prev)
+    })
+    protected page?: Page
 
     @state()
     protected working = false
@@ -89,8 +91,22 @@ class PopupMain extends LitElement
     async _updatePage()
     {
         this.working = true;
-        this.page = await getPageMd(this._options!)
+        this.page = await getCurrentPage(this._options!)
         this.working = false;
+    }
+
+    _titleChanged(e)
+    {
+        if (this.page!.title !== e.target.value)
+        {
+            this.page!.title = e.target.value
+            this.page = this.page!.recalculate(this._options!)
+        }
+    }
+
+    _mdChanged(e)
+    {
+        this.page!.md = e.target.value
     }
 
     _download()
@@ -105,8 +121,20 @@ class PopupMain extends LitElement
     {
         const content = this.page
             ? html`
-            <custom-textfield id="title" customstyles=${PopupMain.titleStyle.cssText} multiline quiet value="${this.page.title}"></custom-textfield>
-            <custom-textfield id="preview" customstyles=${PopupMain.previewStyle.cssText} multiline value="${this.page.md}"></custom-textfield>
+            <custom-textfield
+                id="title"
+                customstyles=${PopupMain.titleStyle.cssText}
+                multiline quiet
+                value=${this.page.title}
+                @change=${this._titleChanged}
+            ></custom-textfield>
+            <custom-textfield
+                id="preview"
+                customstyles=${PopupMain.previewStyle.cssText}
+                multiline
+                value="${this.page.md}"
+                @input=${this._mdChanged}
+            ></custom-textfield>
             <p>${Object.keys(this.page.imgs).length || 0} images</p>
             <sp-button id="download" @click="${this._download}" enabled=${!this.working}>Download</sp-button>
 `

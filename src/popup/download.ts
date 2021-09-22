@@ -1,11 +1,13 @@
 import { browser } from "webextension-polyfill-ts";
 import { Options } from "../option/options-storage";
+import { ensureTrailingSlash } from "../utils";
+import { Page } from "./page";
 
 export async function download(page: Page, options: Options)
 {
     const mdObjUrl = URL.createObjectURL(new Blob([page.md], { type: 'text/markdown;charset=utf-8' }))
-    const mdFilePath = options.mdPath + page.title + '.md'
-    const imagePath = options.imgPath.replaceAll('{title}', page.shortTitle)
+    const mdFilePath = page.evalTemplate(options.mdPath)
+    const imagePath = ensureTrailingSlash(page.evalTemplate(options.imgPath))
 
     browser.downloads.onChanged.addListener(async (dl) =>
     {
