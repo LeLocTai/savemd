@@ -1,12 +1,12 @@
 {
-  "name": "Awesome Extension",
-  "version": "0.0.0",
-  "description": "An awesome new browser extension",
-  "homepage_url": "https://github.com/awesome-templates/browser-extension-template",
+  "name": "Save as Markdown",
+  "version": "1.0.0",
+  "description": "Save current page as Markdown",
+  "homepage_url": "https://github.com/leloctai/savemd",
   "manifest_version": 2,
   "applications": {
     "gecko": {
-      "id": "awesome-extension@notlmn.github.io",
+      "id": "savemd@webext.leloctai",
       "strict_min_version": "67.0"
     }
   },
@@ -19,11 +19,10 @@
     "tabs",
     "downloads",
     "storage",
-    "contextMenus",
-    "clipboardWrite"
+    "contextMenus"
   ],
   "browser_action": {
-    "default_title": "SaveMD",
+    "default_title": "Save as Markdown",
     "default_popup": "popup/popup.html",
     "default_icon": {
       "128": "icon.png"
