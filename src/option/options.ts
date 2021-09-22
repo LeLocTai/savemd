@@ -5,6 +5,9 @@ import '@spectrum-web-components/theme/theme-lightest.js';
 import '@spectrum-web-components/theme/scale-medium.js';
 import '@spectrum-web-components/field-label/sp-field-label.js';
 import '@spectrum-web-components/textfield/sp-textfield.js';
+
+import '../components/textarea';
+
 import optionsStorage, { Options } from "./options-storage";
 import { ensureTrailingSlash } from "../utils";
 
@@ -25,7 +28,7 @@ class OptionMain extends LitElement
     }
 
     .form-field{
-        display:flex;
+        display: flex;
         margin-top: 1em;
     }
 
@@ -33,10 +36,16 @@ class OptionMain extends LitElement
         width: 16ch;
     }
 
-    .form-field sp-textfield{
+    .form-field custom-textfield{
         flex: 1;
     }
     `
+
+    static frontMatterStyle = css`
+        #sizer {
+            white-space: pre;
+        }
+    `;
 
     @state()
     protected _options?: Options;
@@ -55,9 +64,10 @@ class OptionMain extends LitElement
     async _optionsChanged(e)
     {
         const id: string = e.target.id
-        let newValue: string = e.target.value.trim()
+        let newValue: string = e.target.value
         if (id.endsWith('Path'))
         {
+            newValue = newValue.trim()
             newValue = ensureTrailingSlash(newValue)
         }
 
@@ -75,11 +85,15 @@ class OptionMain extends LitElement
             <form>
                 <div class="form-field">
                     <sp-field-label side-aligned="start" for="mdPath">Markdown path</sp-field-label>
-                    <sp-textfield id="mdPath" value=${this._options.mdPath} @change=${this._optionsChanged}></sp-textfield>
+                    <custom-textfield id="mdPath" value=${this._options.mdPath} @change=${this._optionsChanged}></custom-textfield>
                 </div>
                 <div class="form-field">
                     <sp-field-label side-aligned="start" for="imgPath">Images path</sp-field-label>
-                    <sp-textfield id="imgPath" value=${this._options.imgPath} @change=${this._optionsChanged}></sp-textfield>
+                    <custom-textfield id="imgPath" value=${this._options.imgPath} @change=${this._optionsChanged}></custom-textfield>
+                </div>
+                <div class="form-field">
+                    <sp-field-label for="frontMatter">Images path</sp-field-label>
+                    <custom-textfield id="frontMatter" customstyles=${OptionMain.frontMatterStyle.cssText} multiline grows .value=${this._options.frontMatter} @change=${this._optionsChanged}></custom-textfield>
                 </div>
             </form>
         </sp-theme>

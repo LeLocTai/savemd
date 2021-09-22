@@ -3,6 +3,13 @@ import OptionsSync from 'webext-options-sync';
 const defaults = {
     mdPath: 'Documents/Notes/',
     imgPath: 'Documents/Notes/_resources/{title}/',
+    frontMatter: `---
+    tags: []
+    source: {url}
+    created: {date}
+---
+
+`
 }
 
 export type Options = typeof defaults

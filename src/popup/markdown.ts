@@ -6,6 +6,20 @@ import { Options } from '../option/options-storage'
 import path from 'path-browserify'
 import { ensureTrailingSlash } from '../utils'
 
+function evalTemplate(template: string, data: object)
+{
+    const keys = Object.keys(data)
+
+    let result = template
+    for (let key of keys)
+    {
+        result = result.replaceAll(`{${key}}`, data[key])
+    }
+
+    return result
+}
+
+
 export async function getPageMd(options: Options)
 {
     const activeTabs = await browser.tabs.query({ active: true, currentWindow: true, })
@@ -21,19 +35,31 @@ export async function getPageMd(options: Options)
     title = sanitize(title, { replacement: '_' })
 
     let shortTitle = title.length <= 60 ? title : title.substring(0, 60) + '_'
+    const url = document.url
 
     let page: Page = {
-        url: document.url,
+        url,
         title,
         shortTitle,
         imgs: {},
         md: ''
     }
 
-    let imagePath = options.imgPath.replaceAll('{title}', page.shortTitle)
+    let templateData = {
+        title,
+        shortTitle,
+        url,
+        date: new Date().toISOString()
+    }
+
+    let imagePath = evalTemplate(options.imgPath, templateData)
     imagePath = ensureTrailingSlash(path.relative(options.mdPath, imagePath))
 
     fillFromHtml(page, imagePath, document.body)
+
+    const frontMatter = evalTemplate(options.frontMatter, templateData)
+
+    page.md = frontMatter + page.md
 
     return page
 }

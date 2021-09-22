@@ -39,6 +39,7 @@ class PopupMain extends LitElement
 
         #preview {
             margin-top: .5em;
+            --spectrum-textfield-text-size: .85em;
         }
 
         #download{
@@ -47,14 +48,14 @@ class PopupMain extends LitElement
         }
     `;
 
-    titleStyle = css`
+    static titleStyle = css`
         .input {
             font-size: 1.2em;
             font-weight: bold;
         }
     `;
 
-    previewStyle = css`
+    static previewStyle = css`
         :host([multiline]) textarea.input {
             width: 100% !important;
             height: 15em;
@@ -104,10 +105,8 @@ class PopupMain extends LitElement
     {
         const content = this.page
             ? html`
-            <custom-textfield id="title" customstyles=${this.titleStyle.cssText} multiline quiet value="${this.page.title}"></custom-textfield>
-            <custom-textfield id="preview" customstyles=${this.previewStyle.cssText} multiline value="${this.page.md}"></custom-textfield>
-            <sp-field-label for="tags">Tags: </sp-field-label>
-            <custom-textfield id="tags" ></custom-textfield>
+            <custom-textfield id="title" customstyles=${PopupMain.titleStyle.cssText} multiline quiet value="${this.page.title}"></custom-textfield>
+            <custom-textfield id="preview" customstyles=${PopupMain.previewStyle.cssText} multiline value="${this.page.md}"></custom-textfield>
             <p>${Object.keys(this.page.imgs).length || 0} images</p>
             <sp-button id="download" @click="${this._download}" enabled=${!this.working}>Download</sp-button>
 `
