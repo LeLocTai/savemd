@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import { Article } from "./document";
 
 browser.runtime.onMessage.addListener(async (msg) =>
 {
@@ -7,8 +8,8 @@ browser.runtime.onMessage.addListener(async (msg) =>
         case 'want-html': return {
             url: window.location.href,
             title: document.title,
-            body: document.documentElement.outerHTML
-        }
+            html: document.documentElement.outerHTML
+        } as Article
     }
 
     throw 'Unhandle message: ' + msg.cmd

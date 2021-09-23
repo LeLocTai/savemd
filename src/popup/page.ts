@@ -53,10 +53,18 @@ export class Page
 
     constructor(document: Article, options: Options)
     {
-
         this.url = document.url
 
-        this._dom = new DOMParser().parseFromString(document.body, 'text/html')
+        this._dom = new DOMParser().parseFromString(document.html, 'text/html')
+        // Readability need baseUrl to correctly resolves relative link
+        // Otherwise it assume the baseUrl context, popup.html in this case
+        const head = this._dom.head
+        if (head.getElementsByTagName('base').length === 0)
+        {
+            let baseEl = this._dom.createElement('base');
+            baseEl.setAttribute('href', this.url);
+            this._dom.head.appendChild(baseEl);
+        }
         this.simplify = this.shouldSimplify = isProbablyReaderable(this._dom)
 
 
