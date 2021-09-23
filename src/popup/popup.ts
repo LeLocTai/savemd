@@ -159,10 +159,12 @@ class PopupMain extends LitElement
                 value="${this.page.md}"
                 @input=${this._mdChanged}
             ></custom-textfield>
-            <sp-switch  ?checked=${this.page.simplify} @change=${this._toggleSimplify}>
-                Simplify
-                <sp-status-light size="m" variant=${this.page.shouldSimplify ? 'positive' : 'negative'}></sp-status-light>
-            </sp-switch>
+            <div id="toggles">
+                <sp-switch  ?checked=${this.page.simplify} @change=${this._toggleSimplify}>
+                    Simplify
+                    <sp-status-light size="m" variant=${this.page.shouldSimplify ? 'positive' : 'negative'}></sp-status-light>
+                </sp-switch>
+            </div>
 
             <p>${Object.keys(this.page.imgs).length || 0} images</p>
             <sp-button
