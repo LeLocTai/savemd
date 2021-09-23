@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 
 browser.runtime.onMessage.addListener(async (msg) =>
 {
@@ -7,7 +7,7 @@ browser.runtime.onMessage.addListener(async (msg) =>
         case 'want-html': return {
             url: window.location.href,
             title: document.title,
-            body: document.body.outerHTML
+            body: document.documentElement.outerHTML
         }
     }
 

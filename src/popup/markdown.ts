@@ -1,35 +1,6 @@
 import TurndownService from '@joplin/turndown'
 import { gfm } from '@joplin/turndown-plugin-gfm'
-import { browser } from 'webextension-polyfill-ts'
-import { Options } from '../option/options-storage'
-import { Images, Page } from './page'
-
-
-export async function getCurrentPage(options: Options)
-{
-    const activeTabs = await browser.tabs.query({ active: true, currentWindow: true, })
-    const id = activeTabs[0].id
-
-    if (!id) return undefined;
-
-    let document;
-
-    while (true)
-    {
-        try
-        {
-            document = await browser.tabs.sendMessage(id, { cmd: 'want-html' })
-            break
-        } catch {
-            await new Promise(r => setTimeout(r, 500))
-            continue
-        }
-    }
-
-    let page = new Page(document, options)
-
-    return page
-}
+import { Images } from './page'
 
 export function html2md(html, baseUrl, imagePath)
 {

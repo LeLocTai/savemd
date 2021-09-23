@@ -9,12 +9,13 @@ import '@spectrum-web-components/field-label/sp-field-label.js';
 import '@spectrum-web-components/textfield/sp-textfield.js';
 import '@spectrum-web-components/button/sp-button.js';
 import '@spectrum-web-components/progress-circle/sp-progress-circle.js';
+import '@spectrum-web-components/switch/sp-switch.js';
+import '@spectrum-web-components/status-light/sp-status-light.js';
 
 import '../components/textarea';
 
 import { download } from './download';
-import { getCurrentPage } from './markdown';
-import { Page } from './page';
+import { getCurrentPage, Page } from './page';
 import isEqual from 'lodash/isEqual';
 
 @customElement('popup-main')
@@ -31,10 +32,18 @@ class PopupMain extends LitElement
             font-family: sans-serif;
         }
 
+        #title{
+            --spectrum-textfield-text-size: 1.1em;
+        }
+
         #main {
             padding: 16px;
             background: var(--spectrum-global-color-gray-100);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
         }
+
         custom-textfield {
             width: 100%;
         }
@@ -42,17 +51,26 @@ class PopupMain extends LitElement
         #preview {
             margin-top: .5em;
             --spectrum-textfield-text-size: .85em;
+            flex: 1;
+        }
+
+        sp-status-light {
+            display: inline-flex;
+            --spectrum-statuslight-info-text-gap: 2px;
+            --spectrum-statuslight-info-height: 0;
+            --spectrum-statuslight-info-padding-bottom: 0;
+            --spectrum-statuslight-info-padding-top: 0;
         }
 
         #download{
             padding: .5em;
             width: 100%;
+            /* max-height */
         }
     `;
 
     static titleStyle = css`
-        .input {
-            font-size: 1.2em;
+        .input, #sizer {
             font-weight: bold;
         }
     `;
@@ -60,7 +78,7 @@ class PopupMain extends LitElement
     static previewStyle = css`
         :host([multiline]) textarea.input {
             width: 100% !important;
-            height: 400px;
+            height: 100% !important;
         }
     `;
 
@@ -109,6 +127,12 @@ class PopupMain extends LitElement
         this.page!.md = e.target.value
     }
 
+    _toggleSimplify(e)
+    {
+        this.page!.simplify = e.target.checked;
+        this.page = this.page!.recalculate(this._options!)
+    }
+
     _download()
     {
         if (!this.page)
@@ -119,14 +143,12 @@ class PopupMain extends LitElement
 
     render()
     {
-        console.log(this.page?.imgs);
-
         const content = this.page
             ? html`
             <custom-textfield
                 id="title"
                 customstyles=${PopupMain.titleStyle.cssText}
-                multiline quiet
+                multiline grows
                 value=${this.page.title}
                 @change=${this._titleChanged}
             ></custom-textfield>
@@ -137,8 +159,18 @@ class PopupMain extends LitElement
                 value="${this.page.md}"
                 @input=${this._mdChanged}
             ></custom-textfield>
+            <sp-switch  ?checked=${this.page.simplify} @change=${this._toggleSimplify}>
+                Simplify
+                <sp-status-light size="m" variant=${this.page.shouldSimplify ? 'positive' : 'negative'}></sp-status-light>
+            </sp-switch>
+
             <p>${Object.keys(this.page.imgs).length || 0} images</p>
-            <sp-button id="download" @click="${this._download}" enabled=${!this.working}>Download</sp-button>
+            <sp-button
+                id="download"
+                @click="${this._download}"
+                enabled=${!this.working}>
+                Download
+            </sp-button>
 `
             : html`
             <sp-progress-circle

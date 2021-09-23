@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 import { Options } from "../option/options-storage";
 import { ensureTrailingSlash } from "../utils";
 import { Page } from "./page";

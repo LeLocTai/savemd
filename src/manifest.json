@@ -32,12 +32,6 @@
     "chrome_style": true,
     "page": "option/options.html"
   },
-  "background": {
-    "persistent": false,
-    "scripts": [
-      "background.ts"
-    ]
-  },
   "content_scripts": [
     {
       "matches": [
