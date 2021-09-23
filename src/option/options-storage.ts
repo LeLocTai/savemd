@@ -9,7 +9,9 @@ const defaults = {
     created: {date}
 ---
 
-`
+`,
+    theme: 'light',
+    scale: 'medium'
 }
 
 export type Options = typeof defaults

@@ -3,8 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import optionsStorage, { Options } from '../option/options-storage';
 
 import '@spectrum-web-components/theme/sp-theme.js';
-import '@spectrum-web-components/theme/theme-light.js';
-import '@spectrum-web-components/theme/scale-medium.js';
+import '@spectrum-web-components/theme/src/themes.js';
 import '@spectrum-web-components/field-label/sp-field-label.js';
 import '@spectrum-web-components/textfield/sp-textfield.js';
 import '@spectrum-web-components/button/sp-button.js';
@@ -32,16 +31,26 @@ class PopupMain extends LitElement
             font-family: sans-serif;
         }
 
-        #title{
-            --spectrum-textfield-text-size: 1.1em;
-        }
-
         #main {
-            padding: 16px;
+            padding: var(--spectrum-alias-item-padding-l);
             background: var(--spectrum-global-color-gray-100);
             display: flex;
             flex-direction: column;
             height: 600px;
+        }
+
+        h1{
+            /* color: var(--spectrum-alias-heading-text-color); */
+            color: var(--spectrum-alias-text-color-disabled);
+            font-size: var(--spectrum-alias-heading-m-text-size);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: var(--spectrum-alias-heading-margin-bottom);
+        }
+
+        #title{
+            --spectrum-textfield-text-size: var(--spectrum-alias-heading-xxs-text-size);
+            margin-bottom: var(--spectrum-alias-heading-margin-bottom);
         }
 
         custom-textfield {
@@ -49,8 +58,7 @@ class PopupMain extends LitElement
         }
 
         #preview {
-            margin-top: .5em;
-            --spectrum-textfield-text-size: .85em;
+            --spectrum-textfield-text-size: var(--spectrum-alias-item-text-size-s);
             flex: 1;
         }
 
@@ -62,10 +70,9 @@ class PopupMain extends LitElement
             --spectrum-statuslight-info-padding-top: 0;
         }
 
-        #download{
-            padding: .5em;
-            width: 100%;
-            /* max-height */
+        #info {
+            color: var(--spectrum-alias-label-text-color);
+            font-size: var(--spectrum-alias-item-text-size-m);
         }
     `;
 
@@ -145,6 +152,7 @@ class PopupMain extends LitElement
     {
         const content = this.page
             ? html`
+            <h1>Save as Markdown</h1>
             <custom-textfield
                 id="title"
                 customstyles=${PopupMain.titleStyle.cssText}
@@ -166,7 +174,7 @@ class PopupMain extends LitElement
                 </sp-switch>
             </div>
 
-            <p>${Object.keys(this.page.imgs).length || 0} images</p>
+            <p id="info">${Object.keys(this.page.imgs).length || 0} images</p>
             <sp-button
                 id="download"
                 @click="${this._download}"
@@ -182,7 +190,7 @@ class PopupMain extends LitElement
 `
 
         return html`
-        <sp-theme color="light" scale="medium">
+        <sp-theme color=${this._options?.theme || 'light'} scale=${this._options?.scale || 'medium'}>
             <div id="main">
                     ${content}
             </div>

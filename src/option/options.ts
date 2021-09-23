@@ -1,14 +1,16 @@
 import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators";
 import '@spectrum-web-components/theme/sp-theme.js';
-import '@spectrum-web-components/theme/theme-lightest.js';
-import '@spectrum-web-components/theme/scale-medium.js';
+import '@spectrum-web-components/theme/src/themes.js';
 import '@spectrum-web-components/field-label/sp-field-label.js';
 import '@spectrum-web-components/textfield/sp-textfield.js';
+import '@spectrum-web-components/picker/sp-picker.js';
+import '@spectrum-web-components/menu/sp-menu-item.js';
 
 import '../components/textarea';
 
 import optionsStorage, { Options } from "./options-storage";
+import capitalize from 'lodash/capitalize';
 
 @customElement('option-main')
 class OptionMain extends LitElement
@@ -18,17 +20,13 @@ class OptionMain extends LitElement
         box-sizing: border-box;
     }
 
-    :host{
-        background: var(--spectrum-global-color-gray-100);
-    }
-
-    form{
-        margin-top: 4px;
+    :host, form{
+        background: transparent;
     }
 
     .form-field{
         display: flex;
-        margin-top: 1em;
+        margin-bottom: var(--spectrum-alias-body-margin-bottom);
     }
 
     sp-field-label{
@@ -62,8 +60,13 @@ class OptionMain extends LitElement
 
     async _optionsChanged(e)
     {
-        const id: string = e.target.id
+        let id: string = e.target.id
         let newValue: string = e.target.value
+        if (id.startsWith('picker-'))
+        {
+            newValue = newValue.toLowerCase()
+            id = id.substring(7)
+        }
         if (id.endsWith('Path'))
         {
             newValue = newValue.trim()
@@ -72,6 +75,10 @@ class OptionMain extends LitElement
         e.target.value = newValue
 
         await optionsStorage.set({ [id]: newValue })
+
+        this.fetchOptions()
+
+        console.log(this._options)
     }
 
     render()
@@ -79,8 +86,26 @@ class OptionMain extends LitElement
         if (!this._options) return html`...`
 
         return html`
-        <sp-theme color="lightest" scale="medium">
+        <sp-theme color=${this._options.theme} scale=${this._options.scale}>
             <form>
+                <sp-field-group>
+                    <div class="form-field">
+                        <sp-field-label for="picker-theme">Theme:</sp-field-label>
+                        <sp-picker id="picker-theme" value=${capitalize(this._options.theme)} @change=${this._optionsChanged}>
+                            <sp-menu-item>Lightest</sp-menu-item>
+                            <sp-menu-item>Light</sp-menu-item>
+                            <sp-menu-item>Dark</sp-menu-item>
+                            <sp-menu-item>Darkest</sp-menu-item>
+                        </sp-picker>
+                    </div>
+                    <div class="form-field">
+                        <sp-field-label for="picker-scale">Scale:</sp-field-label>
+                        <sp-picker id="picker-scale" value=${capitalize(this._options.scale)} @change=${this._optionsChanged}>
+                            <sp-menu-item>Medium</sp-menu-item>
+                            <sp-menu-item>Large</sp-menu-item>
+                        </sp-picker>
+                    </div>
+                </sp-field-group>
                 <div class="form-field">
                     <sp-field-label side-aligned="start" for="mdPath">Markdown path</sp-field-label>
                     <custom-textfield id="mdPath" value=${this._options.mdPath} @change=${this._optionsChanged}></custom-textfield>
