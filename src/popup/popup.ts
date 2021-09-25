@@ -11,7 +11,7 @@ import '@spectrum-web-components/progress-circle/sp-progress-circle.js';
 import '@spectrum-web-components/switch/sp-switch.js';
 import '@spectrum-web-components/status-light/sp-status-light.js';
 
-import '../components/textarea';
+import '../components/textfield';
 
 import { download } from './download';
 import { getCurrentPage, Page } from './page';

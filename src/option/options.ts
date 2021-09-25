@@ -7,7 +7,7 @@ import '@spectrum-web-components/textfield/sp-textfield.js';
 import '@spectrum-web-components/picker/sp-picker.js';
 import '@spectrum-web-components/menu/sp-menu-item.js';
 
-import '../components/textarea';
+import '../components/textfield';
 
 import optionsStorage, { Options } from "./options-storage";
 import capitalize from 'lodash/capitalize';

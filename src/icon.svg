@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   height="128"
+   viewBox="0 0 128 128"
+   width="128"
+   version="1.1"
+   id="svg13"
+   sodipodi:docname="icon.svg"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   inkscape:export-filename="C:\Users\vzttz\src\browser-extension\savemd\src\icon.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview15"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="4.2868348"
+     inkscape:cx="18.661787"
+     inkscape:cy="91.326123"
+     inkscape:current-layer="svg13"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">
+      .a {
+        fill: #6E6E6E;
+      }
+    </style>
+  </defs>
+  <title
+     id="title6">S SaveFloppy 18 N</title>
+  <rect
+     class="a"
+     height="27.42857"
+     width="18.285715"
+     x="73.14286"
+     y="2.2207157e-06"
+     id="rect9"
+     style="stroke-width:9.14283" />
+  <path
+     class="a"
+     d="m 126.66514,19.625144 c 0,0 -18.35429,-18.2857131 -18.95315,-18.80685592 -0.75054,-0.533106 -1.64853,-0.81912212723 -2.56914,-0.8182862531017 h -4.57142 V 36.571429 H 45.714287 V 2.6802316e-6 H 4.5714285 C 2.0466984,2.837326e-6 1.4440264e-7,2.0467008 0,4.5714308 V 123.42857 C 4.3200938e-7,125.9533 2.0466986,128 4.5714285,128 H 123.42858 C 125.9533,128 128,125.9533 128,123.42857 V 22.857144 c 9.5e-4,-1.211664 -0.47917,-2.374143 -1.33486,-3.232 z M 109.28027,118.85714 H 19.134444 V 54.857144 h 90.145826 z"
+     id="path11"
+     style="stroke-width:9.14283"
+     sodipodi:nodetypes="cccccccsccsssccccccc" />
+  <metadata
+     id="metadata17">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>S SaveFloppy 18 N</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g3856"
+     transform="matrix(9.3654891,0,0,9.3654885,-17.727045,-27.335812)">
+    <path
+       d="m 5.1040475,14.002425 v -3.569573 h 1.0498748 l 1.0498748,1.312343 1.0498743,-1.312343 h 1.0498747 v 3.569573 H 8.2536714 V 11.955171 L 7.2037971,13.267515 6.1539223,11.955171 v 2.047254 z"
+       id="path4"
+       style="fill:#6e6e6e;fill-opacity:1;stroke-width:0.0524937"
+       sodipodi:nodetypes="ccccccccccccc" />
+    <path
+       d="M 11.25539,14.002425 9.6805787,12.270133 h 1.0498763 v -1.837281 h 1.049874 v 1.837281 h 1.049874 z"
+       style="fill:#6e6e6e;fill-opacity:1;stroke-width:0.0524937"
+       id="path3717" />
+  </g>
+</svg>

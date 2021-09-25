@@ -8,14 +8,8 @@ function run(args)
 {
     exec('web-ext run --source-dir dist/webext-dev --start-url ' + args, (err, stdout, stderr) =>
     {
-        if (err)
-        {
-            console.error(err);
-            return;
-        }
-
-        console.log(`stdout: ${stdout}`);
-        console.error(`stderr: ${stderr}`);
+        console.log(stdout);
+        console.error(stderr);
     })
 }
 
