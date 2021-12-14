@@ -15,8 +15,8 @@
     "webext:run": "node scripts/webextrun.js",
     "dev": "run-p watch webext:run",
     "sign": "node scripts/webextsign.js",
-    "zip-source": "git archive --format=zip head > web-ext-artifacts/source.zip",
-    "pack": "npm run build && npm run zip-source"
+    "zip-source": "git ls-files | tar Tzcf - web-ext-artifacts/source.tgz",
+    "pack": "npm run zip-source && npm run build"
   },
   "browserslist": [
     "last 1 Chrome version"
