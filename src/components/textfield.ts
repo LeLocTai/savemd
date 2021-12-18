@@ -1,5 +1,5 @@
 import { Textfield } from "@spectrum-web-components/textfield";
-import { customElement, property } from "lit/decorators";
+import { customElement, property } from "lit/decorators.js";
 import { html } from '@spectrum-web-components/base';
 
 @customElement('custom-textfield')

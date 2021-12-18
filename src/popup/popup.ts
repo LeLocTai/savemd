@@ -83,8 +83,7 @@ class PopupMain extends LitElement
     `;
 
     static previewStyle = css`
-        :host([multiline]) textarea.input {
-            width: 100% !important;
+        #textfield {
             height: 100% !important;
         }
     `;

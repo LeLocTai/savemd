@@ -6,7 +6,7 @@ const testFilePath = path.resolve('./test.html')
 
 function run(args)
 {
-    exec('web-ext run --source-dir dist/webext-dev --start-url ' + args, (err, stdout, stderr) =>
+    exec('web-ext run --source-dir dist --start-url ' + args, (err, stdout, stderr) =>
     {
         console.log(stdout);
         console.error(stderr);
