@@ -46,11 +46,6 @@ export class Page
 
     _dom: Document;
 
-    get shortTitle()
-    {
-        return this.title.length <= 60 ? this.title : this.title.substring(0, 60) + '_'
-    }
-
     constructor(document: Article, options: Options)
     {
         this.url = document.url
@@ -141,7 +136,6 @@ export class Page
     {
         return evalTemplate(template, {
             title: this.title,
-            shortTitle: this.shortTitle,
             url: this.url,
             date: new Date().toISOString()
         })

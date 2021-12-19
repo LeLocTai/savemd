@@ -2,7 +2,7 @@ import OptionsSync from 'webext-options-sync';
 
 const defaults = {
     mdPath: 'Documents/Notes/Web Clips/{title}.md',
-    imgPath: 'Documents/Notes/_resources/{shortTitle}/',
+    imgPath: 'Documents/Notes/_resources/{title}/',
     frontMatter: `---
     tags: []
     source: {url}
