@@ -6,6 +6,7 @@ import { Article } from "../document";
 import { Options } from "../option/options-storage";
 import { ensureTrailingSlash } from "../utils";
 import { html2md } from "./markdown";
+import { md5 } from "../lib/md5.js";
 
 export type Images = { [key: string]: string }
 
@@ -38,8 +39,7 @@ export async function getCurrentPage(options: Options)
 export class Page
 {
     url: string;
-    sourceTitle: string;
-    title: string;
+    title!: string;
     md!: string;
     imgs!: Images;
     shouldSimplify: boolean;
@@ -49,7 +49,10 @@ export class Page
 
     get shortTitle()
     {
-        return this.title.length <= 60 ? this.title : this.title.substring(0, 60) + '_'
+        const title = this.title
+        const hash = md5(title).slice(-6)
+
+        return title.length <= 60 ? title : title.substring(0, 60) + '_' + hash
     }
 
     constructor(document: Article, options: Options)
@@ -68,23 +71,11 @@ export class Page
         }
         this.simplify = this.shouldSimplify = isProbablyReaderable(this._dom)
 
-        this.sourceTitle = document.title
-
         this.recalculate(options)
-
-        let title = this.sourceTitle.trim()
-            .replace(/\.$/, '')
-        title = sanitize(title, { replacement: '' })
-        this.title = title
     }
 
     recalculate(options: Options)
     {
-        const mdPath = this.evalTemplate(options.mdPath)
-        let imagePath = ensureTrailingSlash(this.evalTemplate(options.imgPath))
-        imagePath = ensureTrailingSlash(path.relative(path.dirname(mdPath), imagePath))
-
-
         let html: string | undefined
 
         if (this.simplify)
@@ -93,14 +84,26 @@ export class Page
             if (simplifyResult)
             {
                 html = simplifyResult.html
-                this.sourceTitle = simplifyResult.title
+                if (!this.title)
+                {
+                    this.title = this.sanitizeTitle(simplifyResult.title)
+                }
             }
+        }
+
+        if (!this.title)
+        {
+            this.title = this.sanitizeTitle(document.title)
         }
 
         if (!html)
         {
             html = this._dom.body.outerHTML
         }
+
+        const mdPath = this.evalTemplate(options.mdPath)
+        let imagePath = ensureTrailingSlash(this.evalTemplate(options.imgPath))
+        imagePath = ensureTrailingSlash(path.relative(path.dirname(mdPath), imagePath))
 
         let { md, imgs } = html2md(html, this.url, imagePath)
         md = this.evalTemplate(options.frontMatter) + md
@@ -109,6 +112,13 @@ export class Page
         this.imgs = imgs
 
         return this
+    }
+
+    private sanitizeTitle(title)
+    {
+        title = title.trim().replace(/\.$/, '')
+        title = sanitize(title, { replacement: '' })
+        return title
     }
 
     private simplifyArticle()
@@ -136,7 +146,7 @@ export class Page
         }
     }
 
-    evalTemplate(template)
+    evalTemplate(template: string)
     {
         return evalTemplate(template, {
             title: this.title,
