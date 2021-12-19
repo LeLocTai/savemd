@@ -79,7 +79,7 @@ export class Page
 
         title = title.trim()
             .replace(/\.$/, '')
-        title = sanitize(title, { replacement: '_' })
+        title = sanitize(title, { replacement: '' })
         this.title = title
 
         this.recalculate(options, simplifiedArticle)
