@@ -5,6 +5,7 @@ const { env } = require('process');
 const { ProvidePlugin, optimize } = require('webpack');
 
 const mode = env.NODE_ENV === 'development' ? 'development' : 'production'
+const isProduction = mode !== 'development'
 
 module.exports = {
     mode,
@@ -13,7 +14,7 @@ module.exports = {
         options: './src/option/options.ts',
         content: './src/content.ts'
     },
-    devtool: 'eval-source-map',
+    devtool: isProduction ? undefined : 'eval-source-map',
     output: {
         path: path.resolve(__dirname, 'dist'),
         clean: true,
@@ -59,7 +60,7 @@ module.exports = {
                     to: "manifest.json",
                     transform(buffer)
                     {
-                        if (mode !== 'development')
+                        if (isProduction)
                             return buffer
 
                         const manifest = JSON.parse(buffer.toString())
