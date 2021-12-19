@@ -38,6 +38,7 @@ export async function getCurrentPage(options: Options)
 export class Page
 {
     url: string;
+    sourceTitle: string;
     title: string;
     md!: string;
     imgs!: Images;
@@ -62,30 +63,17 @@ export class Page
         }
         this.simplify = this.shouldSimplify = isProbablyReaderable(this._dom)
 
+        this.sourceTitle = document.title
 
-        let title = document.title
+        this.recalculate(options)
 
-        let simplifiedArticle: any = null;
-        if (this.simplify)
-        {
-            const documentClone = this._dom.cloneNode(true) as Document;
-            simplifiedArticle = new Readability(documentClone).parse()
-        }
-
-        if (simplifiedArticle)
-        {
-            title = simplifiedArticle.title
-        }
-
-        title = title.trim()
+        let title = this.sourceTitle.trim()
             .replace(/\.$/, '')
         title = sanitize(title, { replacement: '' })
         this.title = title
-
-        this.recalculate(options, simplifiedArticle)
     }
 
-    recalculate(options: Options, simplifiedArticle: any = null)
+    recalculate(options: Options)
     {
         const mdPath = this.evalTemplate(options.mdPath)
         let imagePath = ensureTrailingSlash(this.evalTemplate(options.imgPath))
@@ -93,28 +81,14 @@ export class Page
 
 
         let html: string | undefined
+
         if (this.simplify)
         {
-            if (!simplifiedArticle)
+            const simplifyResult = this.simplifyArticle()
+            if (simplifyResult)
             {
-                const documentClone = this._dom.cloneNode(true) as Document;
-                simplifiedArticle = new Readability(documentClone).parse()
-            }
-
-            if (simplifiedArticle)
-            {
-                const simplifiedDom = new DOMParser().parseFromString(simplifiedArticle.content, 'text/html')
-                simplifiedDom.querySelectorAll('[id^=MathJax-Element-').forEach(node =>
-                {
-                    const mathSrcId = node.id.slice(0, -6)
-                    const mathSrc = this._dom.getElementById(mathSrcId)
-                    if (mathSrc)
-                        node.parentNode?.insertBefore(mathSrc, node.nextSibling)
-
-                    node.remove()
-                })
-
-                html = simplifiedDom.body.outerHTML
+                html = simplifyResult.html
+                this.sourceTitle = simplifyResult.title
             }
         }
 
@@ -130,6 +104,31 @@ export class Page
         this.imgs = imgs
 
         return this
+    }
+
+    private simplifyArticle()
+    {
+        const documentClone = this._dom.cloneNode(true) as Document;
+        const simplified = new Readability(documentClone).parse()
+
+        if (!simplified)
+            return null
+
+        const simplifiedDom = new DOMParser().parseFromString(simplified.content, 'text/html')
+        simplifiedDom.querySelectorAll('[id^=MathJax-Element-').forEach(node =>
+        {
+            const mathSrcId = node.id.slice(0, -6)
+            const mathSrc = this._dom.getElementById(mathSrcId)
+            if (mathSrc)
+                node.parentNode?.insertBefore(mathSrc, node.nextSibling)
+
+            node.remove()
+        })
+
+        return {
+            title: simplified.title,
+            html: simplifiedDom.body.outerHTML
+        }
     }
 
     evalTemplate(template)
