@@ -10,12 +10,14 @@ import '@spectrum-web-components/button/sp-button.js';
 import '@spectrum-web-components/progress-circle/sp-progress-circle.js';
 import '@spectrum-web-components/switch/sp-switch.js';
 import '@spectrum-web-components/status-light/sp-status-light.js';
+import '@spectrum-web-components/illustrated-message/sp-illustrated-message.js';
 
 import '../components/textfield';
 
 import { download } from './download';
 import { getCurrentPage, Page } from './page';
 import isEqual from 'lodash/isEqual';
+import { debounce } from 'lodash';
 
 @customElement('popup-main')
 class PopupMain extends LitElement
@@ -68,6 +70,7 @@ class PopupMain extends LitElement
             --spectrum-statuslight-info-height: 0;
             --spectrum-statuslight-info-padding-bottom: 0;
             --spectrum-statuslight-info-padding-top: 0;
+            --spectrum-statuslight-info-dot-resolved-margin-top: 0;
         }
 
         #info {
@@ -123,9 +126,17 @@ class PopupMain extends LitElement
     {
         if (this.page!.title !== e.target.value)
         {
-            this.page!.title = e.target.value
-            this.page = await this.page!.recalculate(this._options!)
+            await this.updateTitleDebounced(e.target.value)
         }
+    }
+
+    updateTitleDebounced = debounce(this.updateTitle, 250)
+    async updateTitle(newTitle: string)
+    {
+        this.page!.title = newTitle
+        this.working = true;
+        await this.page!.recalculate(this._options!)
+        this.working = false;
     }
 
     _mdChanged(e)
@@ -136,7 +147,9 @@ class PopupMain extends LitElement
     async _toggleSimplify(e)
     {
         this.page!.simplify = e.target.checked;
-        this.page = await this.page!.recalculate(this._options!)
+        this.working = true;
+        await this.page!.recalculate(this._options!)
+        this.working = false;
     }
 
     _download()
@@ -144,20 +157,22 @@ class PopupMain extends LitElement
         if (!this.page)
             return
 
+        if (this.working)
+            return
+
         download(this.page, this._options!)
     }
 
     render()
     {
-        const content = (this.page && !this.page.processing)
+        const content = this.page
             ? html`
-            <h1>Save as Markdown</h1>
             <custom-textfield
                 id="title"
                 customstyles=${PopupMain.titleStyle.cssText}
                 multiline grows
                 value=${this.page.title}
-                @change=${this._titleChanged}
+                @input=${this._titleChanged}
             ></custom-textfield>
             <custom-textfield
                 id="preview"
@@ -165,6 +180,7 @@ class PopupMain extends LitElement
                 multiline
                 value="${this.page.md}"
                 @input=${this._mdChanged}
+                ?disabled=${this.working}
             ></custom-textfield>
             <div id="toggles">
                 <sp-switch  ?checked=${this.page.simplify} @change=${this._toggleSimplify}>
@@ -177,21 +193,24 @@ class PopupMain extends LitElement
             <sp-button
                 id="download"
                 @click="${this._download}"
-                enabled=${!this.working}>
+                ?disabled=${this.working}
+            >
                 Download
             </sp-button>
 `
             : html`
-            <sp-progress-circle
-                label="A medium representation of an unclear amount of work"
-                indeterminate
-            ></sp-progress-circle>
+                <sp-illustrated-message
+                    description="Processing..."
+                >
+                    <sp-progress-circle indeterminate ></sp-progress-circle>
+                </sp-illustrated-message>
 `
 
         return html`
         <sp-theme color=${this._options?.theme || 'light'} scale=${this._options?.scale || 'medium'}>
             <div id="main">
-                    ${content}
+                <h1>Save as Markdown</h1>
+                ${content}
             </div>
         </sp-theme>
         `;

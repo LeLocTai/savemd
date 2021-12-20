@@ -58,7 +58,6 @@ export class Page
     imgs!: PageImage[];
     shouldSimplify: boolean;
     simplify: boolean;
-    processing: boolean = true;
 
     _dom: Document;
 
@@ -81,8 +80,6 @@ export class Page
 
     async recalculate(options: Options)
     {
-        this.processing = true
-
         let html: string | undefined
 
         if (this.simplify)
@@ -117,10 +114,6 @@ export class Page
 
         this.md = md
         this.imgs = imgs
-
-        this.processing = false
-
-        return this
     }
 
     private sanitizeTitle(title)
