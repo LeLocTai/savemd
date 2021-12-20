@@ -200,18 +200,22 @@ function wpImgFilter(node: HTMLElement)
 {
     if (node.nodeName !== 'A') return false
 
-    const href = node.getAttribute('href')
+    let href = node.getAttribute('href')
 
     if (href === null) return false
+
+    href = href.split('?')[0]
 
     const innerImgs = Array.from(node.querySelectorAll('img'))
     if (innerImgs.length === 0) return false
 
     return innerImgs.some(img =>
     {
-        if (img.src === href) return true
+        const src = img.src.split('?')[0]
 
-        const matches = img.src.match(/(.+?)-?\d+x\d+(.\w+)/)
+        if (src === href) return true
+
+        const matches = src.match(/(.+?)-?\d+x\d+(.\w+)/)
 
         if (!matches) return false
         if (matches.length < 3) return false
@@ -228,6 +232,5 @@ function wpImgData(node: HTMLLinkElement)
 
     // if (img.src !== node.href)
     //     console.log(`Replaced ${img.src} with ${node.href}`)
-
-    return { src: node.href, alt: img.alt || '' }
+    return { src: node.href.split('?')[0], alt: img.alt || '' }
 }
