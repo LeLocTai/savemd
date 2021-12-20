@@ -23,11 +23,11 @@ export async function download(page: Page, options: Options)
         conflictAction: 'overwrite'
     })
 
-    for (const [imgName, imgUrl] of Object.entries(page.imgs))
+    for (const img of page.imgs)
     {
         browser.downloads.download({
-            url: imgUrl,
-            filename: imagePath + imgName,
+            url: img.src,
+            filename: imagePath + img.fileName,
             conflictAction: 'overwrite'
         })
     }

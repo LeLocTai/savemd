@@ -119,12 +119,12 @@ class PopupMain extends LitElement
         this.working = false;
     }
 
-    _titleChanged(e)
+    async _titleChanged(e)
     {
         if (this.page!.title !== e.target.value)
         {
             this.page!.title = e.target.value
-            this.page = this.page!.recalculate(this._options!)
+            this.page = await this.page!.recalculate(this._options!)
         }
     }
 
@@ -133,10 +133,10 @@ class PopupMain extends LitElement
         this.page!.md = e.target.value
     }
 
-    _toggleSimplify(e)
+    async _toggleSimplify(e)
     {
         this.page!.simplify = e.target.checked;
-        this.page = this.page!.recalculate(this._options!)
+        this.page = await this.page!.recalculate(this._options!)
     }
 
     _download()
@@ -149,7 +149,7 @@ class PopupMain extends LitElement
 
     render()
     {
-        const content = this.page
+        const content = (this.page && !this.page.processing)
             ? html`
             <h1>Save as Markdown</h1>
             <custom-textfield

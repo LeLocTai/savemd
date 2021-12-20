@@ -4,17 +4,29 @@ import sanitize from 'sanitize-filename';
 import browser from "webextension-polyfill";
 import { Article } from "../document";
 import { Options } from "../option/options-storage";
-import { ensureTrailingSlash } from "../utils";
+import { ensureTrailingSlash, shortenName } from "../utils";
 import { html2md } from "./markdown";
-import { md5 } from "../lib/md5.js";
 
-export type Images = { [key: string]: string }
+export interface PageImage
+{
+    src: string;
+    fileName: string;
+}
 
 export async function getCurrentPage(options: Options)
 {
-    const activeTabs = await browser.tabs.query({ active: true, currentWindow: true, })
-    const id = activeTabs[0].id
+    let currentTab = (await browser.tabs.query({ active: true, currentWindow: true, }))[0]
 
+    if (currentTab.status !== null)
+    {
+        while (currentTab.status !== 'complete')
+        {
+            await new Promise(r => setTimeout(r, 500))
+            currentTab = (await browser.tabs.query({ active: true, currentWindow: true, }))[0]
+        }
+    }
+
+    const id = currentTab.id
     if (!id) return undefined;
 
     let document: Article;
@@ -33,6 +45,8 @@ export async function getCurrentPage(options: Options)
 
     let page = new Page(document, options)
 
+    await page.recalculate(options)
+
     return page
 }
 
@@ -41,19 +55,12 @@ export class Page
     url: string;
     title!: string;
     md!: string;
-    imgs!: Images;
+    imgs!: PageImage[];
     shouldSimplify: boolean;
     simplify: boolean;
+    processing: boolean = true;
 
     _dom: Document;
-
-    get shortTitle()
-    {
-        const title = this.title
-        const hash = md5(title).slice(-6)
-
-        return title.length <= 60 ? title : title.substring(0, 60) + '_' + hash
-    }
 
     constructor(document: Article, options: Options)
     {
@@ -70,12 +77,12 @@ export class Page
             this._dom.head.appendChild(baseEl);
         }
         this.simplify = this.shouldSimplify = isProbablyReaderable(this._dom)
-
-        this.recalculate(options)
     }
 
-    recalculate(options: Options)
+    async recalculate(options: Options)
     {
+        this.processing = true
+
         let html: string | undefined
 
         if (this.simplify)
@@ -105,11 +112,13 @@ export class Page
         let imagePath = ensureTrailingSlash(this.evalTemplate(options.imgPath))
         imagePath = ensureTrailingSlash(path.relative(path.dirname(mdPath), imagePath))
 
-        let { md, imgs } = html2md(html, this.url, imagePath)
+        let { md, imgs } = await html2md(html, this.url, imagePath)
         md = this.evalTemplate(options.frontMatter) + md
 
         this.md = md
         this.imgs = imgs
+
+        this.processing = false
 
         return this
     }
@@ -150,7 +159,7 @@ export class Page
     {
         return evalTemplate(template, {
             title: this.title,
-            shortTitle: this.shortTitle,
+            shortTitle: shortenName(this.title, 128),
             url: this.url,
             date: new Date().toISOString()
         })
