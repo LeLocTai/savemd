@@ -123,6 +123,20 @@ export async function html2md(html, baseUrl, imagePath)
         }
     })
 
+    turndown.addRule('img', {
+        filter: imgFilter,
+        replacement: function (content, node: HTMLImageElement, options)
+        {
+            const { src, alt } = imgData(node)
+            const img = imgsBySrc.get(src)!
+            const savedURI = encodeURI(`${imagePath}${img.fileName}`)
+
+            // console.log('img', savedURI)
+
+            return `![${alt}](${savedURI})`;
+        }
+    })
+
     turndown.addRule('wordpress img', {
         filter: wpImgFilter,
         replacement: function (content, node: HTMLLinkElement, options)
@@ -137,17 +151,29 @@ export async function html2md(html, baseUrl, imagePath)
         }
     })
 
-    turndown.addRule('img', {
-        filter: imgFilter,
+    turndown.addRule('wordpress latex img', {
+        filter: function (node: HTMLElement)
+        {
+            if (node.nodeName !== 'IMG') return false;
+
+            const src = node.getAttribute('src')
+            if (src === null) return
+
+            const srcUrl = new URL(src, baseUrl)
+
+            if (!srcUrl.hostname.endsWith('wp.com')) return false
+
+            const latex = srcUrl.searchParams.get('latex')
+            if (latex === null) return false
+
+            return true
+        },
         replacement: function (content, node: HTMLImageElement, options)
         {
-            const { src, alt } = imgData(node)
-            const img = imgsBySrc.get(src)!
-            const savedURI = encodeURI(`${imagePath}${img.fileName}`)
+            const srcUrl = new URL(node.src, baseUrl)
+            const latex = srcUrl.searchParams.get('latex')
 
-            // console.log('img', savedURI)
-
-            return `![${alt}](${savedURI})`;
+            return `$${latex}$`;
         }
     })
 
@@ -200,8 +226,8 @@ function wpImgData(node: HTMLLinkElement)
 {
     const img: HTMLImageElement = Array.from(node.querySelectorAll('img')).find(img => img.src)!
 
-    if (img.src !== node.href)
-        console.log(`Replaced ${img.src} with ${node.href}`)
+    // if (img.src !== node.href)
+    //     console.log(`Replaced ${img.src} with ${node.href}`)
 
     return { src: node.href, alt: img.alt || '' }
 }
